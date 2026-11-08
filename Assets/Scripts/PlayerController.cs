@@ -10,9 +10,9 @@ public class PlayerController : MonoBehaviour
 
     [Header("Ground Movement")]
     public float moveSpeed = 6f;
-    [Tooltip("Units/sec². moveSpeed / this = seconds to reach full speed.")]
+    [Tooltip("Units/secÂ². moveSpeed / this = seconds to reach full speed.")]
     public float groundAcceleration = 40f;
-    [Tooltip("Units/sec². moveSpeed / this = seconds to come to a stop.")]
+    [Tooltip("Units/secÂ². moveSpeed / this = seconds to come to a stop.")]
     public float groundDeceleration = 30f;
 
     [Header("Air Movement")]
@@ -21,28 +21,63 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Slowdown when no input is held in the air. 0 = keep full momentum.")]
     public float airDeceleration = 0f;
 
+        [Header("Dash (Shift)")]
+    [Tooltip("Horizontal speed during the dash. Distance = speed * duration.")]
+    public float dashSpeed = 22f;
+    public float dashDuration = 0.18f;
+    [Tooltip("Time after a dash ends before you can dash again.")]
+    public float dashCooldown = 0.5f;
+    [Tooltip("Horizontal speed is capped to this when the dash ends, so you don't carry full dash speed into the air.")]
+    public float dashExitSpeed = 8f;
+    [Tooltip("How many dashes you get per airtime. Resets on landing.")]
+    public int maxAirDashes = 1;
+    [Tooltip("Airborne dashes stay level instead of falling (or rising) during the dash.")]
+    public bool holdHeightInAir = true;
+
+
     [Header("Jump")]
     public float jumpForce = 7f;
     public float groundCheckDistance = 1.1f;
+    [Tooltip("Upward speed is multiplied by this when jump is released while rising. Lower = shorter hops.")]
+    [Range(0f, 1f)] public float jumpCutMultiplier = 0.4f;
+
 
     [Header("Camera")]
     public float mouseSensitivity = 0.3f;
     public float cameraDistance = 5f;
     public float cameraHeight = 1.3f;
 
-    [Header("Camera COllision")]
+    [Header("Camera Collision")]
+    [Tooltip("Uncheck the Player's own layer.")]
     public LayerMask cameraCollisionMask = ~0;
+    [Tooltip("Minimum cast radius. It is raised automatically to cover the camera's near plane.")]
     public float cameraRadius = 0.2f;
     public float cameraReturnSpeed = 10f;
-    private float currentCamDistance;
+    [Tooltip("Moves the cast origin down so it starts inside the player's capsule.")]
     public float castStartOffset = 0.5f;
+    [Tooltip("Draws the cast in the Scene view while playing: green = ideal, red = actual.")]
+    public bool debugCamera = false;
 
     private Rigidbody rb;
+    private Camera camComponent;
     private float yaw;
     private float pitch;
+    private float currentCamDistance;
 
     private Vector2 moveInput;
     private bool jumpQueued;
+    private bool jumpReleased;
+    private bool isJumping;
+
+    private bool dashQueued;
+
+
+    private bool isDashing;
+    private Vector3 dashDirection;
+    private float dashTimeRemaining;
+    private float dashCooldownTimer;
+    private int airDashesUsed;
+
 
     private void OnEnable() => moveAction.action.Enable();
     private void OnDisable() => moveAction.action.Disable();
@@ -52,30 +87,63 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
         Cursor.lockState = CursorLockMode.Locked;
+
+        camComponent = cam.GetComponent<Camera>();
         currentCamDistance = cameraDistance;
     }
 
-    // Input + camera look run every frame
-    void Update()
+        void Update()
     {
         Look();
-
+ 
         moveInput = Vector2.ClampMagnitude(moveAction.action.ReadValue<Vector2>(), 1f);
-
-        if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
-            jumpQueued = true;
+ 
+        if (Keyboard.current != null)
+        {
+            if (Keyboard.current.spaceKey.wasReleasedThisFrame)
+            {
+                jumpReleased = true;
+            }
+            if (Keyboard.current.spaceKey.wasPressedThisFrame)
+            {
+                jumpQueued = true;
+            }
+            if (Keyboard.current.leftShiftKey.wasPressedThisFrame)
+            {
+                dashQueued = true;
+            }
+        }
     }
 
-    // Physics runs on the fixed timestep
-    void FixedUpdate()
+
+        void FixedUpdate() //update handles physics
     {
         bool grounded = IsGrounded();
-
-        Move(grounded);
-        Jump(grounded);
+ 
+        if (grounded && !isDashing)
+            airDashesUsed = 0;
+ 
+        dashCooldownTimer -= Time.fixedDeltaTime;
+        TryStartDash(grounded);
+ 
+        if (isDashing)
+        {
+            Dash(grounded);
+        }
+        else
+        {
+            Move(grounded);
+            Jump(grounded);
+        }
+ 
+        // Inputs only count for the physics step right after they're pressed
+        jumpQueued = false;
+        dashQueued = false;
+        jumpReleased=false;
     }
 
-    void LateUpdate()
+
+    void LateUpdate() //runs right after what Update()
     {
         PositionCamera();
     }
@@ -94,7 +162,6 @@ public class PlayerController : MonoBehaviour
 
     void Move(bool grounded)
     {
-        // Camera-relative (yaw-relative) desired direction
         Vector3 moveDir = Quaternion.Euler(0f, yaw, 0f) * new Vector3(moveInput.x, 0f, moveInput.y);
         Vector3 targetVelocity = moveDir * moveSpeed;
 
@@ -109,8 +176,6 @@ public class PlayerController : MonoBehaviour
         else
             accel = hasInput ? airAcceleration : airDeceleration;
 
-        // Ease current horizontal velocity toward the target (zero when no input).
-        // In the air the rate is low, so your launch velocity carries you.
         horizontal = Vector3.MoveTowards(horizontal, targetVelocity, accel * Time.fixedDeltaTime);
 
         rb.linearVelocity = new Vector3(horizontal.x, velocity.y, horizontal.z);
@@ -120,19 +185,90 @@ public class PlayerController : MonoBehaviour
     {
         if (jumpQueued && grounded)
         {
-            // Set Y directly so jump height is consistent no matter what
-            // vertical velocity you had. Horizontal velocity is untouched,
-            // so you keep your momentum into the jump.
             Vector3 v = rb.linearVelocity;
             rb.linearVelocity = new Vector3(v.x, jumpForce, v.z);
+            isJumping=true;
         }
-
-        jumpQueued = false;
+        if(jumpReleased && isJumping)
+        {
+            Vector3 v = rb.linearVelocity;
+            if (v.y > 0f)
+            {
+                rb.linearVelocity = new Vector3(v.x, v.y * jumpCutMultiplier, v.z);
+            }
+            isJumping = false;
+        }
+        if (isJumping && rb.linearVelocity.y <= 0f)
+        {
+            isJumping=false;
+        }
     }
+
+        void TryStartDash(bool grounded)
+    {
+        if (!dashQueued || isDashing || dashCooldownTimer > 0f) return;
+        if (!grounded && airDashesUsed >= maxAirDashes) return;
+ 
+        // Direction being held (camera-relative), flattened to the XZ plane
+        Quaternion yawRotation = Quaternion.Euler(0f, yaw, 0f);
+        Vector3 dir = yawRotation * new Vector3(moveInput.x, 0f, moveInput.y);
+ 
+        // No input held: dash straight ahead
+        if (dir.sqrMagnitude < 0.0001f)
+            dir = yawRotation * Vector3.forward;
+ 
+        dashDirection = dir.normalized; // locked in for the whole dash
+        dashTimeRemaining = dashDuration;
+        isDashing = true;
+ 
+        if (!grounded)
+            airDashesUsed++;
+    }
+ 
+    void Dash(bool grounded)
+    {
+        Vector3 velocity = dashDirection * dashSpeed;
+ 
+        // Dash is horizontal only. In the air, optionally cancel vertical movement so it stays level.
+        bool holdHeight = holdHeightInAir && !grounded;
+        velocity.y = holdHeight ? 0f : rb.linearVelocity.y;
+ 
+        rb.linearVelocity = velocity;
+ 
+        dashTimeRemaining -= Time.fixedDeltaTime;
+        if (dashTimeRemaining <= 0f)
+            EndDash();
+    }
+ 
+    void EndDash()
+    {
+        isDashing = false;
+        dashCooldownTimer = dashCooldown;
+ 
+        // Cap leftover horizontal speed so normal movement takes over smoothly
+        Vector3 v = rb.linearVelocity;
+        Vector3 horizontal = Vector3.ClampMagnitude(new Vector3(v.x, 0f, v.z), dashExitSpeed);
+        rb.linearVelocity = new Vector3(horizontal.x, v.y, horizontal.z);
+    }
+
 
     bool IsGrounded()
     {
         return Physics.Raycast(transform.position, Vector3.down, groundCheckDistance);
+    }
+
+    // Distance from the cameras center to the corners of its near clip plane.
+    // The cast sphere has to be at least this big or the view clips into walls.
+    float GetCameraClearance()
+    {
+        if (camComponent == null) return cameraRadius;
+
+        float near = camComponent.nearClipPlane;
+        float halfH = near * Mathf.Tan(camComponent.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        float halfW = halfH * camComponent.aspect;
+        float corner = Mathf.Sqrt(near * near + halfH * halfH + halfW * halfW);
+
+        return Mathf.Max(cameraRadius, corner);
     }
 
     void PositionCamera()
@@ -141,6 +277,7 @@ public class PlayerController : MonoBehaviour
         Vector3 focusPoint = transform.position + Vector3.up * cameraHeight;
         Vector3 backDir = camRotation * Vector3.back;
 
+        // Where the camera wants to be, and where the cast starts (inside the player)
         Vector3 idealPos = focusPoint + backDir * cameraDistance;
         Vector3 castOrigin = focusPoint + Vector3.down * castStartOffset;
 
@@ -148,9 +285,8 @@ public class PlayerController : MonoBehaviour
         float castLength = toIdeal.magnitude;
         Vector3 castDir = toIdeal / castLength;
 
-
-        float targetDistance = cameraDistance;
-        if (Physics.SphereCast(castOrigin, cameraRadius, castDir, out RaycastHit hit,
+        float targetDistance = castLength;
+        if (Physics.SphereCast(castOrigin, GetCameraClearance(), castDir, out RaycastHit hit,
                                castLength, cameraCollisionMask, QueryTriggerInteraction.Ignore))
         {
             targetDistance = hit.distance;
@@ -161,7 +297,13 @@ public class PlayerController : MonoBehaviour
             ? targetDistance
             : Mathf.MoveTowards(currentCamDistance, targetDistance, cameraReturnSpeed * Time.deltaTime);
 
-        cam.position = focusPoint - camRotation * Vector3.forward * cameraDistance;
+        cam.position = castOrigin + castDir * currentCamDistance;
         cam.rotation = camRotation;
+
+        if (debugCamera)
+        {
+            Debug.DrawLine(castOrigin, idealPos, Color.green);
+            Debug.DrawLine(castOrigin, cam.position, Color.red);
+        }
     }
 }

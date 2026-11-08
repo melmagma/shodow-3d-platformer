@@ -315,7 +315,7 @@ GameObject:
   - component: {fileID: 84744707}
   - component: {fileID: 84744709}
   m_Layer: 0
-  m_Name: w
+  m_Name: playa
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -329,7 +329,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 84744700}
   serializedVersion: 5
-  m_Mass: 2
+  m_Mass: 10
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -464,8 +464,15 @@ MonoBehaviour:
   groundDeceleration: 10
   airAcceleration: 10
   airDeceleration: 5
+  dashSpeed: 22
+  dashDuration: 0.18
+  dashCooldown: 0.5
+  dashExitSpeed: 8
+  maxAirDashes: 1
+  holdHeightInAir: 1
   jumpForce: 5
   groundCheckDistance: 1.3
+  jumpCutMultiplier: 0.6
   mouseSensitivity: 0.1
   cameraDistance: 5
   cameraHeight: 1.1
@@ -475,6 +482,7 @@ MonoBehaviour:
   cameraRadius: 0.2
   cameraReturnSpeed: 10
   castStartOffset: 0.5
+  debugCamera: 0
 --- !u!114 &84744707
 MonoBehaviour:
   m_ObjectHideFlags: 0
