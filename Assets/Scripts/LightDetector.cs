@@ -29,7 +29,7 @@ public class LightDetector : MonoBehaviour
         Vector3 targetPos = targetObject.position;
 
         // Find all active lights in the scene (can be cached for performance)
-        Light[] allLights = Object.FindObjectsByType<Light>(FindObjectsSortMode.None);
+        Light[] allLights = FindObjectsByType<Light>();
 
         foreach (Light light in allLights)
         {

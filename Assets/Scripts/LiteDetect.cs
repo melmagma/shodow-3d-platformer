@@ -32,7 +32,7 @@ public class LiteDetect : MonoBehaviour
         Vector3 rayStart = target.position + (Vector3.up * 0.5f);
 
         // Find all active lights in the scene
-        Light[] allLights = Object.FindObjectsByType<Light>(FindObjectsSortMode.None);
+        Light[] allLights = FindObjectsByType<Light>();
 
         foreach (Light light in allLights)
         {

@@ -1,3 +1,5 @@
+using FMOD.Studio;
+using FMODUnity;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,6 +16,8 @@ public class PlayerController : MonoBehaviour
     public float groundAcceleration = 40f;
     [Tooltip("Units/sec². moveSpeed / this = seconds to come to a stop.")]
     public float groundDeceleration = 30f;
+
+    public float speedMultiplier = 1f; // to be reduced when in the range of light, so that speed gets reduced by the multiplier and then placed back to the original speed values.
 
     [Header("Air Movement")]
     [Tooltip("How much you can steer while airborne. Low = heavy momentum.")]
@@ -78,6 +82,7 @@ public class PlayerController : MonoBehaviour
     private float dashCooldownTimer;
     private int airDashesUsed;
 
+    private EventInstance playerFootsteps;
 
     private void OnEnable() => moveAction.action.Enable();
     private void OnDisable() => moveAction.action.Disable();
@@ -90,12 +95,14 @@ public class PlayerController : MonoBehaviour
 
         camComponent = cam.GetComponent<Camera>();
         currentCamDistance = cameraDistance;
+
+        playerFootsteps = AudioManager.instance.CreateEventInstance(FMODEvents.instance.playerFootsteps);
     }
 
         void Update()
     {
         Look();
- 
+
         moveInput = Vector2.ClampMagnitude(moveAction.action.ReadValue<Vector2>(), 1f);
  
         if (Keyboard.current != null)
@@ -119,13 +126,13 @@ public class PlayerController : MonoBehaviour
         void FixedUpdate() //update handles physics
     {
         bool grounded = IsGrounded();
- 
+
         if (grounded && !isDashing)
             airDashesUsed = 0;
  
         dashCooldownTimer -= Time.fixedDeltaTime;
         TryStartDash(grounded);
- 
+
         if (isDashing)
         {
             Dash(grounded);
@@ -135,7 +142,8 @@ public class PlayerController : MonoBehaviour
             Move(grounded);
             Jump(grounded);
         }
- 
+        UpdateSound();
+
         // Inputs only count for the physics step right after they're pressed
         jumpQueued = false;
         dashQueued = false;
@@ -163,7 +171,7 @@ public class PlayerController : MonoBehaviour
     void Move(bool grounded)
     {
         Vector3 moveDir = Quaternion.Euler(0f, yaw, 0f) * new Vector3(moveInput.x, 0f, moveInput.y);
-        Vector3 targetVelocity = moveDir * moveSpeed;
+        Vector3 targetVelocity = moveDir * (moveSpeed * speedMultiplier);
 
         Vector3 velocity = rb.linearVelocity;
         Vector3 horizontal = new Vector3(velocity.x, 0f, velocity.z);
@@ -204,7 +212,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-        void TryStartDash(bool grounded)
+    void TryStartDash(bool grounded)
     {
         if (!dashQueued || isDashing || dashCooldownTimer > 0f) return;
         if (!grounded && airDashesUsed >= maxAirDashes) return;
@@ -304,6 +312,28 @@ public class PlayerController : MonoBehaviour
         {
             Debug.DrawLine(castOrigin, idealPos, Color.green);
             Debug.DrawLine(castOrigin, cam.position, Color.red);
+        }
+    }
+
+    private void UpdateSound()
+    {
+        Vector3 v = rb.linearVelocity;
+        bool isMoving = new Vector2(v.x, v.z).sqrMagnitude > 0.01f;
+
+        if (isMoving && IsGrounded())
+        {
+            playerFootsteps.set3DAttributes(RuntimeUtils.To3DAttributes(gameObject, rb));
+            PLAYBACK_STATE playbackState;
+            playerFootsteps.getPlaybackState(out playbackState);
+            if (playbackState.Equals(PLAYBACK_STATE.STOPPED))
+            {
+                playerFootsteps.start();
+            }
+
+        }
+        else
+        {
+            playerFootsteps.stop(STOP_MODE.ALLOWFADEOUT);
         }
     }
 }
