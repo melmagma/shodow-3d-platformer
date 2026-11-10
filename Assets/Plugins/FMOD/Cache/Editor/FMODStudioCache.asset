@@ -15,7 +15,7 @@ MonoBehaviour:
   Path: FMOD/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 639298794753224349
+  lastModified: 639299208303486693
   FileSizes: []
   Exists: 1
 --- !u!114 &-5908379813952258935
@@ -33,10 +33,10 @@ MonoBehaviour:
   Path: FMOD/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 639298794753244494
+  lastModified: 639299208303511889
   FileSizes:
   - Name: 
-    Value: 1130
+    Value: 1304
   Exists: 1
 --- !u!114 &-5253185456018893218
 MonoBehaviour:
@@ -107,10 +107,10 @@ MonoBehaviour:
   Path: FMOD/Desktop/SFX.bank
   Name: SFX
   StudioPath: bank:/SFX
-  lastModified: 639298779153729564
+  lastModified: 639299203906748157
   FileSizes: []
   Exists: 1
---- !u!114 &-190413284212012648
+--- !u!114 &-1899624003111370879
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -120,25 +120,99 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
-  m_Name: event:/Mezanine Ambience
+  m_Name: event:/Ambience/Stasis Ambience
   m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
-  Path: event:/Mezanine Ambience
+  Path: event:/Ambience/Stasis Ambience
   Guid:
-    Data1: 1814760747
-    Data2: 1231919595
-    Data3: 553338246
-    Data4: 676945973
+    Data1: 933214578
+    Data2: 1105331779
+    Data3: -1205385317
+    Data4: -1948119741
   Banks:
   - {fileID: 2340323344936169896}
   IsStream: 1
   Is3D: 1
   IsOneShot: 1
-  Parameters:
-  - {fileID: -110438520311099128}
+  Parameters: []
   MinDistance: 1
   MaxDistance: 20
-  Length: 55870
---- !u!114 &-110438520311099128
+  Length: 120000
+--- !u!114 &-1324105788741017257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Metal Scrape
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/SFX/Metal Scrape
+  Guid:
+    Data1: -910464542
+    Data2: 1179186684
+    Data3: 68467125
+    Data4: -183623934
+  Banks:
+  - {fileID: -1974967739482063693}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d32cf7c32a3ed8347bac48ef5ed56d82, type: 3}
+  m_Name: FMODStudioCache
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EventCache
+  EditorBanks:
+  - {fileID: -5908379813952258935}
+  - {fileID: 2340323344936169896}
+  - {fileID: -8283212598579315134}
+  - {fileID: -1974967739482063693}
+  EditorEvents:
+  - {fileID: -5253185456018893218}
+  - {fileID: 1134573494682766990}
+  - {fileID: -3682649066551304829}
+  - {fileID: 700490300700753894}
+  - {fileID: 3453230114205373295}
+  - {fileID: 1554471273502544724}
+  - {fileID: -1324105788741017257}
+  - {fileID: -1899624003111370879}
+  EditorParameters: []
+  MasterBanks:
+  - {fileID: -8283212598579315134}
+  StringsBanks:
+  - {fileID: -5908379813952258935}
+  cacheVersion: 131861
+  cacheTime: 639299208303511889
+  SerializableEventsDict:
+  - key: event:/Ambience Test
+    index: 0
+  - key: event:/SFX/Player Walk
+    index: 1
+  - key: snapshot:/Mezanine
+    index: 2
+  - key: snapshot:/Corridor
+    index: 3
+  - key: event:/Ambience/Mezanine Ambience
+    index: 4
+  - key: event:/Ambience/Corridor Ambience
+    index: 5
+  - key: event:/SFX/Metal Scrape
+    index: 6
+--- !u!114 &100298809608167080
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -162,45 +236,6 @@ MonoBehaviour:
   IsGlobal: 0
   Labels: []
   Exists: 1
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d32cf7c32a3ed8347bac48ef5ed56d82, type: 3}
-  m_Name: FMODStudioCache
-  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EventCache
-  EditorBanks:
-  - {fileID: -5908379813952258935}
-  - {fileID: 2340323344936169896}
-  - {fileID: -8283212598579315134}
-  - {fileID: -1974967739482063693}
-  EditorEvents:
-  - {fileID: -5253185456018893218}
-  - {fileID: 1134573494682766990}
-  - {fileID: -3682649066551304829}
-  - {fileID: -190413284212012648}
-  - {fileID: 700490300700753894}
-  EditorParameters: []
-  MasterBanks:
-  - {fileID: -8283212598579315134}
-  StringsBanks:
-  - {fileID: -5908379813952258935}
-  cacheVersion: 131861
-  cacheTime: 639298794753244494
-  SerializableEventsDict:
-  - key: event:/Ambience Test
-    index: 0
-  - key: event:/SFX/Player Walk
-    index: 1
-  - key: snapshot:/Mezanine
-    index: 2
-  - key: event:/Mezanine Ambience
-    index: 3
 --- !u!114 &700490300700753894
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -255,6 +290,34 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 2000
+--- !u!114 &1554471273502544724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Ambience/Corridor Ambience
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Ambience/Corridor Ambience
+  Guid:
+    Data1: 1487063856
+    Data2: 1186274505
+    Data3: 1744296126
+    Data4: -392220559
+  Banks:
+  - {fileID: -1974967739482063693}
+  - {fileID: 2340323344936169896}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 5247
 --- !u!114 &2340323344936169896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -270,6 +333,34 @@ MonoBehaviour:
   Path: FMOD/Desktop/Ambience.bank
   Name: Ambience
   StudioPath: bank:/Ambience
-  lastModified: 639298793570587008
+  lastModified: 639299208303407847
   FileSizes: []
   Exists: 1
+--- !u!114 &3453230114205373295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Ambience/Mezanine Ambience
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Ambience/Mezanine Ambience
+  Guid:
+    Data1: 1814760747
+    Data2: 1231919595
+    Data3: 553338246
+    Data4: 676945973
+  Banks:
+  - {fileID: 2340323344936169896}
+  IsStream: 1
+  Is3D: 1
+  IsOneShot: 0
+  Parameters:
+  - {fileID: 100298809608167080}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 55870

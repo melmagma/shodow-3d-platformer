@@ -973,7 +973,7 @@ GameObject:
   - component: {fileID: 13012648}
   - component: {fileID: 13012647}
   - component: {fileID: 13012646}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube (84)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6425,6 +6425,7 @@ GameObject:
   - component: {fileID: 84744708}
   - component: {fileID: 84744709}
   - component: {fileID: 84744710}
+  - component: {fileID: 84744711}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -6547,14 +6548,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 84744700}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.00016812979, z: -0, w: -1}
-  m_LocalPosition: {x: -191.8, y: 2.1, z: 14.7}
+  m_LocalRotation: {x: -0, y: -0.7116565, z: -0, w: -0.70252764}
+  m_LocalPosition: {x: -311.19, y: 0.796, z: 7.09}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 330585546}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 359.981, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 450.74, z: 0}
 --- !u!114 &84744706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6594,6 +6595,7 @@ MonoBehaviour:
   cameraReturnSpeed: 10
   castStartOffset: 0.5
   debugCamera: 0
+  controlLocked: 0
 --- !u!114 &84744707
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6667,6 +6669,52 @@ MonoBehaviour:
   m_EditorClassIdentifier: FMODUnity::FMODUnity.StudioListener
   nonRigidbodyVelocity: 0
   attenuationObject: {fileID: 84744700}
+--- !u!114 &84744711
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 84744700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6ed82196a21b9e46b77744e9dab2490, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShadowSwim
+  wallLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  occluders:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  darkThreshold: 0.1
+  litEjectDelay: 0.15
+  toggleKey: 55
+  exitJumpKey: 1
+  exitDashKey: 51
+  jumpDashEndsSwim: 1
+  climbSpeed: 7
+  attachReach: 0.4
+  minClimbAngle: 60
+  maxClimbAngle: 110
+  reattachDelay: 0.25
+  ledgeHopUp: 6
+  ledgeHopForward: 3.5
+  exitJumpOutSpeed: 4
+  exitJumpUpSpeed: 9
+  hideWhileClimbing: []
+  onEnterSwim:
+    m_PersistentCalls:
+      m_Calls: []
+  onExitSwim:
+    m_PersistentCalls:
+      m_Calls: []
+  onAttachWall:
+    m_PersistentCalls:
+      m_Calls: []
+  onDetachWall:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &85303451
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12584,28 +12632,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 179680966}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
+  m_Script: {fileID: 11500000, guid: 718fc368d776c4d4f993a9786f777cfb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: FMODUnity::FMODUnity.StudioEventEmitter
-  CollisionTag: Player
-  EventReference:
-    Guid:
-      Data1: -1619867992
-      Data2: 1314309959
-      Data3: -2052190281
-      Data4: -1417520036
-    Path: snapshot:/Corridor
-  Event: 
-  EventPlayTrigger: 3
-  EventStopTrigger: 4
-  AllowFadeout: 1
-  TriggerOnce: 0
-  Preload: 0
-  NonRigidbodyVelocity: 0
-  Params: []
-  OverrideAttenuation: 0
-  OverrideMinDistance: 0
-  OverrideMaxDistance: 0
+  m_EditorClassIdentifier: Assembly-CSharp::AmbienceZones
+  parameterName: Mezanine_Fan_Intensity
+  parameterValue: 0
 --- !u!1 &182989874
 GameObject:
   m_ObjectHideFlags: 0
@@ -20415,7 +20446,7 @@ Light:
   m_InnerSpotAngle: 47.67538
   m_CookieSize2D: {x: 0.5, y: 0.5}
   m_Shadows:
-    m_Type: 2
+    m_Type: 1
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -20448,7 +20479,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 2
+  m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -37580,6 +37611,7 @@ GameObject:
   - component: {fileID: 567256656}
   - component: {fileID: 567256655}
   - component: {fileID: 567256657}
+  - component: {fileID: 567256658}
   m_Layer: 0
   m_Name: AudioReverbZone_Mezzanine
   m_TagString: Untagged
@@ -37632,17 +37664,31 @@ MonoBehaviour:
   m_GameObject: {fileID: 567256654}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 718fc368d776c4d4f993a9786f777cfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AmbienceZones
+  parameterName: Mezanine_Fan_Intensity
+  parameterValue: 1
+--- !u!114 &567256658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 567256654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FMODUnity::FMODUnity.StudioEventEmitter
   CollisionTag: Player
   EventReference:
     Guid:
-      Data1: -942528083
-      Data2: 1074848833
-      Data3: -316002158
-      Data4: 1951161961
-    Path: snapshot:/Mezanine
+      Data1: 1487063856
+      Data2: 1186274505
+      Data3: 1744296126
+      Data4: -392220559
+    Path: event:/Ambience/Corridor Ambience
   Event: 
   EventPlayTrigger: 3
   EventStopTrigger: 4
@@ -37652,8 +37698,8 @@ MonoBehaviour:
   NonRigidbodyVelocity: 0
   Params: []
   OverrideAttenuation: 0
-  OverrideMinDistance: 0
-  OverrideMaxDistance: 0
+  OverrideMinDistance: 1
+  OverrideMaxDistance: 20
 --- !u!1 &567274483
 GameObject:
   m_ObjectHideFlags: 0
@@ -62896,6 +62942,91 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 930771386}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &931656634
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 931656637}
+  - component: {fileID: 931656636}
+  - component: {fileID: 931656635}
+  m_Layer: 0
+  m_Name: AudioReverbZone_MainRoom
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &931656635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 931656634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FMODUnity::FMODUnity.StudioEventEmitter
+  CollisionTag: Player
+  EventReference:
+    Guid:
+      Data1: 933214578
+      Data2: 1105331779
+      Data3: -1205385317
+      Data4: -1948119741
+    Path: event:/Ambience/Stasis Ambience
+  Event: 
+  EventPlayTrigger: 1
+  EventStopTrigger: 4
+  AllowFadeout: 1
+  TriggerOnce: 0
+  Preload: 0
+  NonRigidbodyVelocity: 0
+  Params: []
+  OverrideAttenuation: 0
+  OverrideMinDistance: 1
+  OverrideMaxDistance: 20
+--- !u!65 &931656636
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 931656634}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 79.51536, y: 9.400236, z: 81.31607}
+  m_Center: {x: 26.994762, y: 4.200119, z: -46.78517}
+--- !u!4 &931656637
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 931656634}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -312.6, y: -0.51149, z: 26.89975}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!64 &931952713
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -91098,7 +91229,7 @@ GameObject:
   - component: {fileID: 1384716210}
   - component: {fileID: 1384716209}
   - component: {fileID: 1384716208}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube (91)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -103361,7 +103492,7 @@ GameObject:
   - component: {fileID: 1616853028}
   - component: {fileID: 1616853027}
   - component: {fileID: 1616853026}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube (94)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -115962,7 +116093,7 @@ Light:
   m_InnerSpotAngle: 47.67538
   m_CookieSize2D: {x: 0.5, y: 0.5}
   m_Shadows:
-    m_Type: 2
+    m_Type: 1
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -115995,7 +116126,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 2
+  m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -138124,4 +138255,5 @@ SceneRoots:
   - {fileID: 1675873546}
   - {fileID: 179680968}
   - {fileID: 567256656}
+  - {fileID: 931656637}
   - {fileID: 94318539}

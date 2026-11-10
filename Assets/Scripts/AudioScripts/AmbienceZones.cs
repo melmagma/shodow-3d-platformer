@@ -3,12 +3,16 @@ using UnityEngine;
 
 public class AmbienceZones : MonoBehaviour
 {
-    public Collider Area;
-    public GameObject Player;
+    [Header("Parameter Change")]
+    [SerializeField] private string parameterName;
+    [SerializeField] private float parameterValue;
 
-    void Update()
+    private void OnTriggerEnter(Collider other)
     {
-        Vector3 closestPoint = Area.ClosestPoint(Player.transform.position);
-        transform.position = closestPoint;
+        if(CompareTag("Player"))
+        {
+            AudioManager.instance.SetAmbienceParameter(parameterName, parameterValue);
+            Debug.Log("Ambience Parameter values have Changed");
+        }
     }
 }

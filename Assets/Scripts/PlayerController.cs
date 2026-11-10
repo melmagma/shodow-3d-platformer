@@ -84,6 +84,10 @@ public class PlayerController : MonoBehaviour
 
     private EventInstance playerFootsteps;
 
+    [HideInInspector] public bool controlLocked;
+    public Vector2 MoveInput => moveInput;
+
+
     private void OnEnable() => moveAction.action.Enable();
     private void OnDisable() => moveAction.action.Disable();
 
@@ -124,7 +128,16 @@ public class PlayerController : MonoBehaviour
 
 
         void FixedUpdate() //update handles physics
-    {
+        {
+        if (controlLocked)
+        {
+            jumpQueued = dashQueued = jumpReleased = false;
+            isDashing = false;
+            isJumping = false;
+            playerFootsteps.stop(STOP_MODE.ALLOWFADEOUT);
+            return;
+        }
+
         bool grounded = IsGrounded();
 
         if (grounded && !isDashing)
@@ -148,7 +161,7 @@ public class PlayerController : MonoBehaviour
         jumpQueued = false;
         dashQueued = false;
         jumpReleased=false;
-    }
+        }
 
 
     void LateUpdate() //runs right after what Update()
@@ -187,6 +200,26 @@ public class PlayerController : MonoBehaviour
         horizontal = Vector3.MoveTowards(horizontal, targetVelocity, accel * Time.fixedDeltaTime);
 
         rb.linearVelocity = new Vector3(horizontal.x, velocity.y, horizontal.z);
+    }
+
+    public void SwimExitJump(Vector3 launchVelocity)
+    {
+        controlLocked = false;
+        jumpQueued = dashQueued = jumpReleased = false;
+        isDashing = false;
+        isJumping = true;               // keeps release-to-shorten-hop working
+        rb.linearVelocity = launchVelocity;
+    }
+
+    public void SwimExitDash(Vector3 direction)
+    {
+        controlLocked = false;
+        jumpQueued = dashQueued = jumpReleased = false;
+        dashDirection = direction.normalized;
+        dashTimeRemaining = dashDuration;
+        dashCooldownTimer = 0f;
+        isDashing = true;
+        isJumping = false;
     }
 
     void Jump(bool grounded)

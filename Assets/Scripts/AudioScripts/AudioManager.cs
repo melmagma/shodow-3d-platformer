@@ -9,6 +9,13 @@ public class AudioManager : MonoBehaviour
 
     [field : SerializeField] public static AudioManager instance { get; private set; }
 
+    private EventInstance ambienceEventInstance;
+
+    private void Start()
+    {
+        AudioManager.instance.InitializeAmbience(FMODEvents.instance.mezanineAmbience, transform);
+    }
+
     private void Awake()
     {
         if (instance == null)
@@ -35,6 +42,19 @@ public class AudioManager : MonoBehaviour
         EventInstance eventInstance = RuntimeManager.CreateInstance(eventReference);
         eventInstances.Add(eventInstance);
         return eventInstance;
+    }
+
+
+    private void InitializeAmbience(EventReference ambienceEventReference, Transform followTarget)
+    {
+        ambienceEventInstance = CreateEventInstance(ambienceEventReference);
+        RuntimeManager.AttachInstanceToGameObject(ambienceEventInstance, followTarget.gameObject);
+        ambienceEventInstance.start();
+    }
+
+    public void SetAmbienceParameter(string parameterName, float parameterValue)
+    {
+        ambienceEventInstance.setParameterByName(parameterName, parameterValue);
     }
 
     private void CleanUp()
