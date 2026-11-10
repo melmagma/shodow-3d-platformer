@@ -62,6 +62,17 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Draws the cast in the Scene view while playing: green = ideal, red = actual.")]
     public bool debugCamera = false;
 
+    [Header("Light Slowdown")]
+    [SerializeField] private LightDetector lightDetector;
+    [Tooltip("Light intensity at or below this means no slowdown.")]
+    public float minLightIntensity = 0.5f;
+    [Tooltip("Light intensity at or above this means maximum slowdown.")]
+    public float maxLightIntensity = 5f;
+    [Tooltip("Speed multiplier when standing in the brightest light.")]
+    [Range(0f, 1f)] public float minSpeedMultiplier = 0.4f;
+    [Tooltip("How quickly the multiplier changes, per second.")]
+    public float multiplierChangeRate = 3f;
+
     private Rigidbody rb;
     private Camera camComponent;
     private float yaw;
@@ -103,11 +114,12 @@ public class PlayerController : MonoBehaviour
         playerFootsteps = AudioManager.instance.CreateEventInstance(FMODEvents.instance.playerFootsteps);
     }
 
-        void Update()
+    void Update()
     {
         Look();
 
         moveInput = Vector2.ClampMagnitude(moveAction.action.ReadValue<Vector2>(), 1f);
+
  
         if (Keyboard.current != null)
         {
@@ -139,6 +151,8 @@ public class PlayerController : MonoBehaviour
         }
 
         bool grounded = IsGrounded();
+
+        UpdateLightSlowdown();
 
         if (grounded && !isDashing)
             airDashesUsed = 0;
@@ -368,5 +382,18 @@ public class PlayerController : MonoBehaviour
         {
             playerFootsteps.stop(STOP_MODE.ALLOWFADEOUT);
         }
+    }
+    void UpdateLightSlowdown()
+    {
+        float intensity = lightDetector != null ? lightDetector.CurrentIntensity : 0f;
+
+        // 0 at minLightIntensity, 1 at maxLightIntensity
+        float t = Mathf.InverseLerp(minLightIntensity, maxLightIntensity, intensity);
+
+        // Bright light -> lower multiplier
+        float targetMultiplier = Mathf.Lerp(1f, minSpeedMultiplier, t);
+
+        speedMultiplier = Mathf.MoveTowards(speedMultiplier, targetMultiplier,
+                                            multiplierChangeRate * Time.fixedDeltaTime);
     }
 }
