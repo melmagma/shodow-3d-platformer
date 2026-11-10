@@ -52,8 +52,8 @@ public class Health : MonoBehaviour
         bool inDamagingLight = intensity > 0f && intensity >= intensityThreshold;
 
         // Slow while in light, restore the moment you leave
-        if (player != null)
-            player.speedMultiplier = inDamagingLight ? lightSpeedMultiplier : 1f;
+        /*if (player != null)
+            player.speedMultiplier = inDamagingLight ? lightSpeedMultiplier : 1f;*/
 
         if (inDamagingLight)
         {

@@ -7,14 +7,17 @@ public class LightDetector : MonoBehaviour
 
     [Header("Debug")]
     [SerializeField] private bool logToConsole = true;
-    
+
+    public float CurrentIntensity { get; private set; }
+
     private void Update()
     {
         // Make sure we have a target assigned before calculating
         if (targetObject != null)
         {
             float intensity = GetDirectLightIntensityOnObject(targetObject);
-            
+            CurrentIntensity = GetDirectLightIntensityOnObject(targetObject);
+
             if (logToConsole)
             {
                 // Prints the value to the Unity Console window
