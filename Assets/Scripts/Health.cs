@@ -39,6 +39,7 @@ public class Health : MonoBehaviour
 
     private void Awake()
     {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         CurrentHealth = maxHealth;
         if (target == null) target = transform;
         player = GetComponent<PlayerController>();
