@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
     public float groundAcceleration = 40f;
     [Tooltip("Units/sec². moveSpeed / this = seconds to come to a stop.")]
     public float groundDeceleration = 30f;
+    [Tooltip("Extra acceleration on the ground when input opposes current velocity. 1 = none.")]
+    public float groundTurnBoost = 2.5f;
 
     public float speedMultiplier = 1f; // to be reduced when in the range of light, so that speed gets reduced by the multiplier and then placed back to the original speed values.
 
@@ -25,7 +27,26 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Slowdown when no input is held in the air. 0 = keep full momentum.")]
     public float airDeceleration = 0f;
 
-        [Header("Dash (Shift)")]
+    [Header("Gravity")]
+    [Tooltip("Multiplier on Unity's gravity while rising. 1 = default.")]
+    public float riseGravityMultiplier = 1.8f;
+    [Tooltip("Multiplier while falling. Higher than rise = snappier landings.")]
+    public float fallGravityMultiplier = 2.6f;
+    public float maxFallSpeed = 30f;
+
+    [Header("Landing")]
+    [Tooltip("Seconds after touching down that ground friction is reduced, so air speed carries over.")]
+    public float landingSlideTime = 0.25f;
+    [Tooltip("Ground accel/decel multiplier at the moment of landing, easing back to 1 over the slide time. 0 = pure slide, 1 = no effect.")]
+    [Range(0f, 1f)] public float landingFrictionMultiplier = 0.2f;
+
+    [Header("Jump Forgiveness")]
+    [Tooltip("Seconds after leaving the ground that you can still jump.")]
+    public float coyoteTime = 0.1f;
+    [Tooltip("Seconds a jump press is remembered before landing.")]
+    public float jumpBufferTime = 0.12f;
+
+    [Header("Dash (Shift)")]
     [Tooltip("Horizontal speed during the dash. Distance = speed * duration.")]
     public float dashSpeed = 22f;
     public float dashDuration = 0.18f;
@@ -50,6 +71,10 @@ public class PlayerController : MonoBehaviour
     public float mouseSensitivity = 0.3f;
     public float cameraDistance = 5f;
     public float cameraHeight = 1.3f;
+
+    [Header("Facing")]
+    [Tooltip("Degrees per second the player turns toward its movement direction.")]
+    public float turnSpeed = 720f;
 
     [Header("Camera Collision")]
     [Tooltip("Uncheck the Player's own layer.")]
@@ -86,6 +111,10 @@ public class PlayerController : MonoBehaviour
 
     private bool dashQueued;
 
+    private float coyoteTimer;
+    private float jumpBufferTimer;
+    private bool wasGrounded;
+    private float landingSlideTimer;
 
     private bool isDashing;
     private Vector3 dashDirection;
@@ -117,6 +146,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         Look();
+        UpdateFacing();
 
         moveInput = Vector2.ClampMagnitude(moveAction.action.ReadValue<Vector2>(), 1f);
 
@@ -130,6 +160,7 @@ public class PlayerController : MonoBehaviour
             if (Keyboard.current.spaceKey.wasPressedThisFrame)
             {
                 jumpQueued = true;
+                jumpBufferTimer = jumpBufferTime;
             }
             if (Keyboard.current.leftShiftKey.wasPressedThisFrame)
             {
@@ -139,8 +170,8 @@ public class PlayerController : MonoBehaviour
     }
 
 
-        void FixedUpdate() //update handles physics
-        {
+    void FixedUpdate() //update handles physics
+    {
         if (controlLocked)
         {
             jumpQueued = dashQueued = jumpReleased = false;
@@ -151,6 +182,13 @@ public class PlayerController : MonoBehaviour
         }
 
         bool grounded = IsGrounded();
+        if (grounded && !wasGrounded)
+            landingSlideTimer = landingSlideTime;   // just touched down
+        else if (landingSlideTimer > 0f)
+            landingSlideTimer -= Time.fixedDeltaTime;
+
+        wasGrounded = grounded;
+        coyoteTimer = (grounded && !isJumping) ? coyoteTime : coyoteTimer - Time.fixedDeltaTime;
 
         UpdateLightSlowdown();
 
@@ -169,13 +207,18 @@ public class PlayerController : MonoBehaviour
             Move(grounded);
             Jump(grounded);
         }
+
+        ApplyGravity(grounded);
         UpdateSound();
 
         // Inputs only count for the physics step right after they're pressed
-        jumpQueued = false;
+        jumpBufferTimer -= Time.fixedDeltaTime;
+        if (jumpBufferTimer <= 0f) jumpQueued = false;
+        dashQueued = false;
+        jumpReleased = false;
         dashQueued = false;
         jumpReleased=false;
-        }
+    }
 
 
     void LateUpdate() //runs right after what Update()
@@ -191,8 +234,6 @@ public class PlayerController : MonoBehaviour
         yaw += mouseDelta.x * mouseSensitivity;
         pitch -= mouseDelta.y * mouseSensitivity;
         pitch = Mathf.Clamp(pitch, -40f, 70f);
-
-        transform.rotation = Quaternion.Euler(0f, yaw, 0f);
     }
 
     void Move(bool grounded)
@@ -211,6 +252,19 @@ public class PlayerController : MonoBehaviour
         else
             accel = hasInput ? airAcceleration : airDeceleration;
 
+        if (grounded && hasInput && horizontal.sqrMagnitude > 0.01f)
+        {
+            // 1 = already moving the way you're pushing, -1 = fully reversing
+            float alignment = Vector3.Dot(horizontal.normalized, moveDir.normalized);
+            accel *= Mathf.Lerp(groundTurnBoost, 1f, (alignment + 1f) * 0.5f);
+        }
+
+        if (grounded && landingSlideTimer > 0f)
+        {
+            // 0 at the moment of landing, 1 when the slide window ends
+            float t = 1f - landingSlideTimer / landingSlideTime;
+            accel *= Mathf.Lerp(landingFrictionMultiplier, 1f, t);
+        }
         horizontal = Vector3.MoveTowards(horizontal, targetVelocity, accel * Time.fixedDeltaTime);
 
         rb.linearVelocity = new Vector3(horizontal.x, velocity.y, horizontal.z);
@@ -238,11 +292,17 @@ public class PlayerController : MonoBehaviour
 
     void Jump(bool grounded)
     {
-        if (jumpQueued && grounded)
+        if (jumpQueued && coyoteTimer > 0f)
         {
             Vector3 v = rb.linearVelocity;
             rb.linearVelocity = new Vector3(v.x, jumpForce, v.z);
-            isJumping=true;
+            isJumping = true;
+            jumpQueued = false;
+            coyoteTimer = 0f;
+
+            // A buffered tap you already let go of should still be a short hop
+            if (Keyboard.current != null && !Keyboard.current.spaceKey.isPressed)
+                jumpReleased = true;
         }
         if(jumpReleased && isJumping)
         {
@@ -259,6 +319,19 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void ApplyGravity(bool grounded)
+    {
+        if (grounded) return;
+
+        float vy = rb.linearVelocity.y;
+        float mult = vy > 0f ? riseGravityMultiplier : fallGravityMultiplier;
+
+        // Unity already applies 1x gravity, so add only the remainder
+        rb.AddForce(Physics.gravity * (mult - 1f), ForceMode.Acceleration);
+
+        if (vy < -maxFallSpeed)
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, -maxFallSpeed, rb.linearVelocity.z);
+    }
     void TryStartDash(bool grounded)
     {
         if (!dashQueued || isDashing || dashCooldownTimer > 0f) return;
@@ -270,7 +343,7 @@ public class PlayerController : MonoBehaviour
  
         // No input held: dash straight ahead
         if (dir.sqrMagnitude < 0.0001f)
-            dir = yawRotation * Vector3.forward;
+            dir = transform.forward;
  
         dashDirection = dir.normalized; // locked in for the whole dash
         dashTimeRemaining = dashDuration;
@@ -362,6 +435,27 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void UpdateFacing()
+    {
+        if (controlLocked) return; // your swim code owns facing while locked
+
+        Vector3 faceDir;
+        float speed = turnSpeed;
+
+        if (isDashing)
+        {
+            faceDir = dashDirection;
+            speed *= 4f; // dash snaps around almost instantly
+        }
+        else if (moveInput.sqrMagnitude > 0.0001f)
+        {
+            faceDir = Quaternion.Euler(0f, yaw, 0f) * new Vector3(moveInput.x, 0f, moveInput.y);
+        }
+        else return; // no input: keep facing the same way
+
+        Quaternion targetRot = Quaternion.LookRotation(faceDir, Vector3.up);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, speed * Time.deltaTime);
+    }
     private void UpdateSound()
     {
         Vector3 v = rb.linearVelocity;

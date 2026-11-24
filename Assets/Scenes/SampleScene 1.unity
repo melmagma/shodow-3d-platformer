@@ -15604,6 +15604,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2842756196198121304, guid: 6d0791488d0f3ed47bc86401fddf8642, type: 3}
+      propertyPath: m_Mass
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2842756196198121304, guid: 6d0791488d0f3ed47bc86401fddf8642, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2842756196198121304, guid: 6d0791488d0f3ed47bc86401fddf8642, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3309204926409194662, guid: 6d0791488d0f3ed47bc86401fddf8642, type: 3}
       propertyPath: m_LocalPosition.x
       value: -313.77
@@ -15644,6 +15656,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6460479641207663799, guid: 6d0791488d0f3ed47bc86401fddf8642, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: fd0d791dec8730447b4a07c86e67c180, type: 2}
     - target: {fileID: 7011368931659124746, guid: 6d0791488d0f3ed47bc86401fddf8642, type: 3}
       propertyPath: target
       value: 
@@ -15677,6 +15693,10 @@ PrefabInstance:
       value: playa
       objectReference: {fileID: 0}
     - target: {fileID: 8159852098758697476, guid: 6d0791488d0f3ed47bc86401fddf8642, type: 3}
+      propertyPath: jumpForce
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8159852098758697476, guid: 6d0791488d0f3ed47bc86401fddf8642, type: 3}
       propertyPath: moveSpeed
       value: 8
       objectReference: {fileID: 0}
@@ -15684,6 +15704,10 @@ PrefabInstance:
       propertyPath: lightDetector
       value: 
       objectReference: {fileID: 252693387}
+    - target: {fileID: 8159852098758697476, guid: 6d0791488d0f3ed47bc86401fddf8642, type: 3}
+      propertyPath: fallGravityMultiplier
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 166938385701840197, guid: 6d0791488d0f3ed47bc86401fddf8642, type: 3}
