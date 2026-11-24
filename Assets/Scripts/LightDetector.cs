@@ -4,12 +4,17 @@ public class LightDetector : MonoBehaviour
 {
     [SerializeField] private Transform targetObject;
     [SerializeField] private LayerMask occlusionLayers; // Layers that block light (e.g., Default, Environment)
+    [SerializeField] private Light[] allLights;
 
     [Header("Debug")]
     [SerializeField] private bool logToConsole = true;
 
     public float CurrentIntensity { get; private set; }
 
+    private void Awake()
+    {
+        allLights = FindObjectsByType<Light>();
+    }
     private void Update()
     {
         // Make sure we have a target assigned before calculating
@@ -32,7 +37,7 @@ public class LightDetector : MonoBehaviour
         Vector3 targetPos = targetObject.position;
 
         // Find all active lights in the scene (can be cached for performance)
-        Light[] allLights = FindObjectsByType<Light>();
+        
 
         foreach (Light light in allLights)
         {
