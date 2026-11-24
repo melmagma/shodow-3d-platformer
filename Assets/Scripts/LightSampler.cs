@@ -15,6 +15,7 @@ public static class LightSampler
 
     private static Light[] lights = new Light[0];
     private static float lastRefresh = float.NegativeInfinity;
+    private static readonly RaycastHit[] hitBuffer = new RaycastHit[16];
 
     /// <summary>Force a re-scan (call after spawning/destroying lights if you can't wait 0.5s).</summary>
     public static void RefreshLights()
@@ -23,9 +24,12 @@ public static class LightSampler
         lastRefresh = Time.unscaledTime;
     }
 
-    public static bool IsLit(Vector3 point, Vector3 normal, int surfaceLayer, int occluders, float threshold)
+    /// <param name="ignore">Optional. Colliders and lights under this transform don't count (pass the player,
+    /// so its own body doesn't shadow the surface and its own lights don't light it).</param>
+    public static bool IsLit(Vector3 point, Vector3 normal, int surfaceLayer, int occluders, float threshold,
+                             Transform ignore = null)
     {
-        return SampleIntensity(point, normal, surfaceLayer, occluders, threshold) >= threshold;
+        return SampleIntensity(point, normal, surfaceLayer, occluders, threshold, ignore) >= threshold;
     }
 
     /// <summary>
@@ -33,7 +37,7 @@ public static class LightSampler
     /// (so IsLit doesn't have to check every light).
     /// </summary>
     public static float SampleIntensity(Vector3 point, Vector3 normal, int surfaceLayer, int occluders,
-                                        float stopAbove = float.PositiveInfinity)
+                                        float stopAbove = float.PositiveInfinity, Transform ignore = null)
     {
         // Time.unscaledTime < lastRefresh covers "Enter Play Mode without domain reload"
         if (Time.unscaledTime < lastRefresh || Time.unscaledTime - lastRefresh > RefreshInterval)
@@ -49,6 +53,9 @@ public static class LightSampler
 
             // Lights can be set to ignore certain layers
             if ((light.cullingMask & (1 << surfaceLayer)) == 0) continue;
+
+            // The player's own lights (e.g. a flashlight) never count
+            if (ignore != null && light.transform.IsChildOf(ignore)) continue;
 
             Vector3 toLight;
             float distance;
@@ -75,8 +82,8 @@ public static class LightSampler
                     float outerHalf = light.spotAngle * 0.5f;
                     if (angle > outerHalf) continue;
 
-                    // Soft edge between the inner and outer cone
-                    float innerHalf = light.innerSpotAngle * 0.5f;
+                    float innerHalf = light.innerSpotAngle * 0.5f; // Soft edge between the inner and outer cone
+
                     if (angle > innerHalf)
                         attenuation *= Mathf.InverseLerp(outerHalf, innerHalf, angle);
                 }
@@ -86,13 +93,12 @@ public static class LightSampler
                 continue; // area lights only exist in baked lighting
             }
 
-            // Surface facing away from this light = not lit by it
-            float facing = Vector3.Dot(normal, toLight);
+            float facing = Vector3.Dot(normal, toLight); // Surface facing away from this light = not lit by it
+
             if (facing <= 0.001f) continue;
 
-            // Shadow check. Lights with shadows turned off light everything, same as they do visually.
-            if (light.shadows != LightShadows.None &&
-                Physics.Raycast(origin, toLight, distance, occluders, QueryTriggerInteraction.Ignore))
+         
+            if (light.shadows != LightShadows.None && IsOccluded(origin, toLight, distance, occluders, ignore)) // Shadow check. Lights with shadows turned off light everything, same as they do visually.
                 continue;
 
             total += light.intensity * attenuation * facing;
@@ -100,5 +106,19 @@ public static class LightSampler
         }
 
         return total;
+    }
+
+    
+    private static bool IsOccluded(Vector3 origin, Vector3 dir, float distance, int occluders, Transform ignore) // Shadow ray that skips anything under 'ignore'
+    {
+        if (ignore == null)
+            return Physics.Raycast(origin, dir, distance, occluders, QueryTriggerInteraction.Ignore);
+
+        int count = Physics.RaycastNonAlloc(origin, dir, hitBuffer, distance, occluders, QueryTriggerInteraction.Ignore);
+        for (int i = 0; i < count; i++)
+        {
+            if (!hitBuffer[i].collider.transform.IsChildOf(ignore)) return true;
+        }
+        return false;
     }
 }

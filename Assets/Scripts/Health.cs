@@ -34,6 +34,7 @@ public class Health : MonoBehaviour
     public float CurrentHealth { get; private set; }
 
     private PlayerController player;
+    private ShadowSwim swim;
     private float tickTimer;
     private bool isDead;
 
@@ -42,6 +43,7 @@ public class Health : MonoBehaviour
         CurrentHealth = maxHealth;
         if (target == null) target = transform;
         player = GetComponent<PlayerController>();
+        swim = GetComponent<ShadowSwim>();
     }
 
     private void Update()
@@ -50,12 +52,9 @@ public class Health : MonoBehaviour
 
         float intensity = lightDetector.GetDirectLightIntensityOnObject(target); // Zero light = safe. Otherwise only hurt if intensity reaches the threshold.
         bool inDamagingLight = intensity > 0f && intensity >= intensityThreshold;
+        if (swim != null && swim.IsLightImmune) inDamagingLight = false; // sunk into a shadow
 
-        // Slow while in light, restore the moment you leave
-        /*if (player != null)
-            player.speedMultiplier = inDamagingLight ? lightSpeedMultiplier : 1f;*/
-
-        if (inDamagingLight)
+        if (inDamagingLight) //slow down while in light
         {
             tickTimer += Time.deltaTime;
             if (tickTimer >= tickInterval)

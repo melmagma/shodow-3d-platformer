@@ -278,8 +278,15 @@ GameObject:
   - component: {fileID: 6460479641207663799}
   - component: {fileID: 2842756196198121304}
   - component: {fileID: 8159852098758697476}
+  - component: {fileID: 2376101903711292868}
+  - component: {fileID: 5090376600871128524}
+  - component: {fileID: 3104275920141248511}
+  - component: {fileID: 6763882414609227136}
+  - component: {fileID: 3186926610086258955}
+  - component: {fileID: 7990354606894264682}
   - component: {fileID: 8831149434279505064}
   - component: {fileID: 7011368931659124746}
+  - component: {fileID: 7167384652008365997}
   m_Layer: 0
   m_Name: playa
   m_TagString: Player
@@ -423,38 +430,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc429b39a92dcb945b99b44781af1dd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  cam: {fileID: 4698300199464284111}
   moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  moveSpeed: 10
-  groundAcceleration: 20
-  groundDeceleration: 10
-  speedMultiplier: 1
-  airAcceleration: 10
-  airDeceleration: 5
-  dashSpeed: 22
-  dashDuration: 0.18
-  dashCooldown: 0.5
-  dashExitSpeed: 8
-  maxAirDashes: 1
-  holdHeightInAir: 1
-  jumpForce: 5
   groundCheckDistance: 1.3
-  jumpCutMultiplier: 0.6
-  mouseSensitivity: 0.1
-  cameraDistance: 5
-  cameraHeight: 1.1
-  cameraCollisionMask:
-    serializedVersion: 2
-    m_Bits: 1
-  cameraRadius: 0.2
-  cameraReturnSpeed: 10
-  castStartOffset: 0.5
-  debugCamera: 0
-  lightDetector: {fileID: 0}
-  minLightIntensity: 0.5
-  maxLightIntensity: 5
-  minSpeedMultiplier: 0.4
-  multiplierChangeRate: 3
   controlLocked: 0
 --- !u!114 &8831149434279505064
 MonoBehaviour:
@@ -497,3 +474,156 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   lightSpeedMultiplier: 0.65
+--- !u!114 &2376101903711292868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7992542289979147045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52216e64870d4921b039be9649debce7, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  moveSpeed: 8
+  groundAcceleration: 20
+  groundDeceleration: 10
+  groundTurnBoost: 2.5
+  airAcceleration: 10
+  airDeceleration: 5
+  riseGravityMultiplier: 1.8
+  fallGravityMultiplier: 1
+  maxFallSpeed: 30
+  landingSlideTime: 0.25
+  landingFrictionMultiplier: 0.2
+--- !u!114 &5090376600871128524
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7992542289979147045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2a1004b78594f7ab7e66a778bc6636c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerJump
+  jumpForce: 10
+  jumpCutMultiplier: 0.6
+  coyoteTime: 0.1
+  jumpBufferTime: 0.12
+--- !u!114 &3104275920141248511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7992542289979147045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d35199edeea64cebae1231721e799c13, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDash
+  dashSpeed: 22
+  dashDuration: 0.18
+  dashCooldown: 0.5
+  dashExitSpeed: 8
+  maxAirDashes: 1
+  holdHeightInAir: 1
+--- !u!114 &6763882414609227136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7992542289979147045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10dd27916d1e468693cc78b85ee574e3, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCamera
+  cam: {fileID: 4698300199464284111}
+  mouseSensitivity: 0.1
+  minPitch: -40
+  maxPitch: 70
+  cameraDistance: 5
+  cameraHeight: 1.1
+  cameraCollisionMask:
+    serializedVersion: 2
+    m_Bits: 1
+  cameraRadius: 0.2
+  cameraReturnSpeed: 10
+  castStartOffset: 0.5
+  debugCamera: 0
+--- !u!114 &3186926610086258955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7992542289979147045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fda3c92d7a34cf0ad8a71255c9d3058, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerFootsteps
+--- !u!114 &7990354606894264682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7992542289979147045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e50cbf49ee324d04b68196c221e11ed6, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLightSlowdown
+  lightDetector: {fileID: 8831149434279505064}
+  minLightIntensity: 0.5
+  maxLightIntensity: 5
+  minSpeedMultiplier: 0.4
+  multiplierChangeRate: 3
+--- !u!114 &7167384652008365997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7992542289979147045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6ed82196a21b9e46b77744e9dab2490, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::ShadowSwim
+  swimmableLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  onEnterSwim:
+    m_PersistentCalls:
+      m_Calls: []
+  onExitSwim:
+    m_PersistentCalls:
+      m_Calls: []
+  onSubmerge:
+    m_PersistentCalls:
+      m_Calls: []
+  onEmerge:
+    m_PersistentCalls:
+      m_Calls: []
+  onAttachWall:
+    m_PersistentCalls:
+      m_Calls: []
+  onDetachWall:
+    m_PersistentCalls:
+      m_Calls: []
+  onBoostReady:
+    m_PersistentCalls:
+      m_Calls: []
+  onJump:
+    m_PersistentCalls:
+      m_Calls: []
+  onBoostJump:
+    m_PersistentCalls:
+      m_Calls: []
